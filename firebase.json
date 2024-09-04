@@ -8,6 +8,34 @@
     ],
     "rewrites": [
       {
+        "source": "example/example_embedded_call.html",
+        "destination": "/example/example_embedded_call.html"
+      },
+      {
+        "source": "example/example_embedded_rating.html",
+        "destination": "/example/example_embedded_rating.html"
+      },
+      {
+        "source": "example/example_embedded_statistics.html",
+        "destination": "/example/example_embedded_statistics.html"
+      },
+      {
+        "source": "example/example_embedded_advertisement.html",
+        "destination": "/example/example_embedded_advertisement.html"
+      },
+      {
+        "source": "example/example_embedded_login.html",
+        "destination": "/example/example_embedded_login.html"
+      },
+      {
+        "source": "example/example_embedded_registration.html",
+        "destination": "/example/example_embedded_registration.html"
+      },
+      {
+        "source": "example/example_embedded_wallet_balance.html",
+        "destination": "/example/example_embedded_wallet_balance.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Ratings</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .ratings-container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .user-rating {
+            margin-bottom: 20px;
+        }
+        .user-name {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .stars {
+            color: #ffcc00;
+            font-size: 20px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        @media (max-width: 600px) {
+            .ratings-container {
+                padding: 30px;
+            }
+        }
+        @media (max-width: 400px) {
+            .ratings-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="ratings-container">
+    <p class="description">
+        This is a sample embedded page to display user ratings.
+    </p>
+    <h1>User Ratings</h1>
+    <div class="user-rating">
+        <div class="user-name">User 1</div>
+        <div class="stars">★★★★☆</div>
+    </div>
+    <div class="user-rating">
+        <div class="user-name">User 2</div>
+        <div class="stars">★★★☆☆</div>
+    </div>
+    <div class="user-rating">
+        <div class="user-name">User 3</div>
+        <div class="stars">★★★★★</div>
+    </div>
+</div>
+</body>
+</html>
