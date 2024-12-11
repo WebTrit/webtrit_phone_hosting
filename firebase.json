@@ -36,6 +36,10 @@
         "destination": "/example/example_embedded_wallet_balance.html"
       },
       {
+        "source": "example/example_embedded_pbx_settings.html",
+        "destination": "/example/example_embedded_pbx_settings.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBX Settings</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h3 class="mb-4">PBX Settings</h3>
+
+    <div class="card">
+        <div class="card-body">
+            <form>
+                <!-- Call Forwarding Unconditional -->
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="callForwardingUnconditional">
+                    <label class="form-check-label" for="callForwardingUnconditional">
+                        Call forwarding unconditional
+                    </label>
+                </div>
+
+                <!-- Call Forwarding If Not Answered -->
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="callForwardingIfNotAnswered" checked>
+                    <label class="form-check-label" for="callForwardingIfNotAnswered">
+                        Call forwarding if not answered in the app
+                    </label>
+                </div>
+
+                <!-- Phone Number Input -->
+                <div class="form-group">
+                    <label for="phoneNumber">Phone number:</label>
+                    <input type="text" class="form-control" id="phoneNumber" placeholder="Enter phone number"
+                           value="2065551234">
+                </div>
+
+                <!-- Save Button -->
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
