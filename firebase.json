@@ -1,5 +1,16 @@
 {
   "hosting": {
+    "headers": [
+      {
+        "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      }
+    ],
     "public": "public",
     "ignore": [
       "firebase.json",
@@ -38,6 +49,18 @@
       {
         "source": "example/example_embedded_pbx_settings.html",
         "destination": "/example/example_embedded_pbx_settings.html"
+      },
+      {
+        "source": "example/scheduled.html",
+        "destination": "/example/example_embedded_scheduled.html"
+      },
+      {
+        "source": "example/history.html",
+        "destination": "/example/example_embedded_history.html"
+      },
+      {
+        "source": "example/example_embedded_payload_data.html",
+        "destination": "/example/example_embedded_payload_data.html"
       },
       {
         "source": "**",

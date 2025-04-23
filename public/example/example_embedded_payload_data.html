@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payload Data</title>
+    <style>
+        body {
+          font-family: 'Arial', sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          padding: 20px;
+          box-sizing: border-box;
+          background-color: #f5f7fa;
+        }
+
+        .payload-container {
+          text-align: center;
+          background-color: #ffffff;
+          padding: 40px;
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+          max-width: 600px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        h1 {
+          color: #333;
+          margin-bottom: 20px;
+          font-size: 24px;
+        }
+
+        .payload-text {
+          text-align: left;
+          background: #f0f0f0;
+          padding: 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #444;
+          overflow-x: auto;
+        }
+
+        .info {
+          color: #666;
+          margin-bottom: 20px;
+          font-size: 16px;
+          line-height: 1.6;
+        }
+
+        .loader {
+          border: 6px solid #f3f3f3;
+          border-top: 6px solid #007bff;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+          .payload-container { padding: 30px; }
+        }
+
+        @media (max-width: 400px) {
+          .payload-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="payload-container">
+    <h1>Payload Data</h1>
+    <div id="loadingIndicator" class="loader"></div>
+    <p id="infoText" class="info">Waiting for the payload from the native app...</p>
+    <pre id="payloadOutput" class="payload-text" style="display: none;"></pre>
+</div>
+
+<script>
+    window.onPayloadDataReady = function(data) {
+      const output = document.getElementById('payloadOutput');
+      const loader = document.getElementById('loadingIndicator');
+      const info = document.getElementById('infoText');
+
+      loader.style.display = 'none';
+      info.style.display = 'none';
+      output.style.display = 'block';
+      output.textContent = JSON.stringify(data, null, 2);
+    };
+</script>
+</body>
+</html>
