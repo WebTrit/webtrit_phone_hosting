@@ -1,119 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
+    <title>OTP Login</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
         }
+
         .form-container {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 16px;
+            margin-bottom: 80px;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+
+        .description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
+
         .form-group label {
             display: block;
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
         }
+
         .form-group input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
         }
-        .form-group button {
-            padding: 10px 20px;
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .fixed-button {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            height: 40px;
+            background-color: #F95A14;
+            color: white;
             font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
+            text-align: center;
             border: none;
-            border-radius: 4px;
+            border-radius: 24px;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .form-group button:hover {
-            background-color: #0056b3;
+
+        .fixed-button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
         }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 16px;
-            line-height: 1.6;
+
+        .fixed-button .button-text {
+            display: inline-block;
         }
-        @media (max-width: 600px) {
-            .form-container {
-                padding: 30px;
+
+        .fixed-button .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid white;
+            border-top: 3px solid #F95A14;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .fixed-button.loading .button-text {
+            display: none;
+        }
+
+        .fixed-button.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
             }
-        }
-        @media (max-width: 400px) {
-            .form-container {
-                padding: 20px;
+
+            to {
+                transform: rotate(360deg);
             }
         }
     </style>
 </head>
+
 <body>
 <div class="form-container">
-    <p class="description">
-        This is a sample embedded page to display a user login form.
+    <p class="description" id="descriptionText">
+        Enter your email to receive a one-time password (OTP) for login.
     </p>
-    <h1>Login</h1>
-    <form onsubmit="return handleLogin()">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="example@example.com" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" value="password123" required>
-        </div>
-        <div class="form-group">
-            <button type="submit">Login</button>
-        </div>
-    </form>
+    <div class="form-group">
+        <label for="email" id="emailLabel">Email</label>
+        <input id="email" name="email" required>
+    </div>
 </div>
 
+<button class="fixed-button" id="submitButton" onclick="handleLogin()">
+    <span class="button-text" id="submitButtonText">Submit</span>
+    <div class="spinner"></div>
+</button>
+
 <script>
-    function handleLogin() {
-        var email = document.getElementById('email').value;
-        var password = document.getElementById('password').value;
+    const translations = {
+        en: {
+            description: "Enter your email to receive a one-time password (OTP) for login.",
+            emailLabel: "Email",
+            submitButtonText: "Submit",
+            alert: "Please enter your email."
+        },
+        uk: {
+            description: "Введіть свою електронну адресу, щоб отримати одноразовий пароль (OTP) для входу.",
+            emailLabel: "Електронна пошта",
+            submitButtonText: "Надіслати",
+            alert: "Будь ласка, введіть свою електронну адресу."
+        },
+        it: {
+            description: "Inserisci la tua email per ricevere una password monouso (OTP) per l'accesso.",
+            emailLabel: "Email",
+            submitButtonText: "Invia",
+            alert: "Per favore inserisci la tua email."
+        }
+    };
 
-        // Generate the token using concatenation
-        var token = email + ':' + password;
+    function setLocale(locale) {
+        const translation = translations[locale];
+        if (!translation) return;
 
-        // Wrap the token in a JSON structure
-        var tokenJson = JSON.stringify({ token: token });
+        document.getElementById("descriptionText").textContent = translation.description;
+        document.getElementById("emailLabel").textContent = translation.emailLabel;
+        document.getElementById("submitButtonText").textContent = translation.submitButtonText;
 
-        // Send the JSON string to Flutter using the JavaScript channel
-        WebtritLoginChannel.postMessage(tokenJson);
-
-        return false; // Prevent form submission
+        // Store the locale in a global variable for later use (e.g., for alerts)
+        window.currentLocale = locale;
     }
+
+        function showProgress() {
+            const button = document.getElementById("submitButton");
+            button.disabled = true;
+            button.classList.add("loading");
+        }
+
+        function hideProgress() {
+            const button = document.getElementById("submitButton");
+            button.disabled = false;
+            button.classList.remove("loading");
+        }
+
+    function handleLogin() {
+        const email = document.getElementById("email").value;
+
+        if (!email) {
+            const alertMessage = translations[window.currentLocale || "en"].alert;
+            alert(alertMessage);
+            return;
+        }
+
+        const json = {
+            event: "signup",
+            data: {
+                email: email
+            }
+        };
+
+        WebtritLoginChannel.postMessage(JSON.stringify(json));
+    }
+
+    // Initialize default locale
+    setLocale("en");
 </script>
 </body>
+
 </html>
