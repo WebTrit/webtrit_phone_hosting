@@ -63,6 +63,14 @@
         "destination": "/example/example_embedded_payload_data.html"
       },
       {
+        "source": "example/custom_signup_patient.html",
+        "destination": "/example/custom_signup_patient.html"
+      },
+      {
+        "source": "example/scheduled_visits.html",
+        "destination": "/example/scheduled_visits.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
