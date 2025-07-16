@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Media Query Viewer</title>
+    <style>
+        html, body {
+          margin: 0;
+          padding: 0;
+        }
+
+        body {
+          font-family: 'Arial', sans-serif;
+          min-height: 100vh;
+          background-color: #ffffff;
+          color: #000000;
+          position: relative;
+          padding-bottom: 0; /* padding will be added dynamically */
+        }
+
+        #statusBarSpacer {
+          background-color: #2196f3;
+          width: 100vw;
+          height: 0;
+          transition: height 0.3s ease;
+        }
+
+        #bottomSafeInsetSpacer {
+          background-color: #f44336;
+          width: 100vw;
+          height: 0;
+          transition: height 0.3s ease;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          z-index: 1000;
+          pointer-events: none;
+        }
+
+        .media-query-header {
+          font-weight: bold;
+          margin: 24px 16px 8px;
+          font-size: 18px;
+        }
+
+        .media-query-info {
+          font-size: 14px;
+          background: #f9f9f9;
+          padding: 12px 16px;
+          margin: 0 16px 24px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Visual representation of top and bottom safe areas -->
+<div id="statusBarSpacer"></div>
+<div id="bottomSafeInsetSpacer"></div>
+
+<div class="media-query-header">Media Query Info</div>
+<div class="media-query-info" id="mediaQueryOutput">Waiting for Flutter injection...</div>
+
+<script>
+    window.onMediaQueryReady = function (payload) {
+      try {
+        const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
+
+        const {
+          statusBarHeight,
+          navigationBarHeight,
+          bottomSafeInset,
+          brightness
+        } = data;
+
+        // Top safe area (status bar)
+        document.getElementById("statusBarSpacer").style.height = `${statusBarHeight}px`;
+
+        // Bottom safe area (red bar)
+        const bottomSpacer = document.getElementById("bottomSafeInsetSpacer");
+        bottomSpacer.style.height = `${bottomSafeInset}px`;
+
+        // Add navigation bar height as internal padding
+        document.body.style.paddingBottom = `${navigationBarHeight}px`;
+
+        // Dark mode
+        if (brightness === 'dark') {
+          document.body.style.backgroundColor = "#121212";
+          document.body.style.color = "#f0f0f0";
+        }
+
+        // Show raw data
+        document.getElementById("mediaQueryOutput").textContent =
+          JSON.stringify(data, null, 2);
+      } catch (e) {
+        console.error('Failed to apply MediaQuery data', e);
+        document.getElementById("mediaQueryOutput").textContent = 'Failed to parse MediaQuery payload.';
+      }
+    };
+</script>
+</body>
+</html>

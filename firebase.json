@@ -39,6 +39,10 @@
         "destination": "/example/example_embedded_login.html"
       },
       {
+        "source": "example/example_embedded_media_query.html",
+        "destination": "/example/example_embedded_media_query.html"
+      },
+      {
         "source": "example/example_embedded_registration.html",
         "destination": "/example/example_embedded_registration.html"
       },
