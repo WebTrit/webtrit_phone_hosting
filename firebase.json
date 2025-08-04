@@ -75,6 +75,10 @@
         "destination": "/example/scheduled_visits.html"
       },
       {
+        "source": "example/example_embedded_spa.html",
+        "destination": "/example/example_embedded_spa.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

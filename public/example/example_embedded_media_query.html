@@ -16,14 +16,20 @@
           background-color: #ffffff;
           color: #000000;
           position: relative;
-          padding-bottom: 0; /* padding will be added dynamically */
+          padding-top: 0;
+          padding-bottom: 0;
         }
 
-        #statusBarSpacer {
+        #topSafeInsetSpacer {
           background-color: #2196f3;
           width: 100vw;
           height: 0;
           transition: height 0.3s ease;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+          pointer-events: none;
         }
 
         #bottomSafeInsetSpacer {
@@ -53,16 +59,29 @@
           border-radius: 8px;
           white-space: pre-wrap;
         }
+
+        .keyboard-test-input {
+          margin: 0 16px 32px;
+          padding: 12px;
+          font-size: 16px;
+          width: calc(100% - 32px);
+          box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
-<!-- Visual representation of top and bottom safe areas -->
-<div id="statusBarSpacer"></div>
+<div id="topSafeInsetSpacer"></div>
 <div id="bottomSafeInsetSpacer"></div>
 
 <div class="media-query-header">Media Query Info</div>
 <div class="media-query-info" id="mediaQueryOutput">Waiting for Flutter injection...</div>
+
+<input
+        class="keyboard-test-input"
+        type="text"
+        placeholder="Tap here to open keyboard"
+/>
 
 <script>
     window.onMediaQueryReady = function (payload) {
@@ -70,29 +89,22 @@
         const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
 
         const {
-          statusBarHeight,
-          navigationBarHeight,
+          topSafeInset,
           bottomSafeInset,
-          brightness
+          brightness,
+          devicePixelRatio
         } = data;
 
-        // Top safe area (status bar)
-        document.getElementById("statusBarSpacer").style.height = `${statusBarHeight}px`;
+        document.getElementById("topSafeInsetSpacer").style.height = `${topSafeInset}px`;
+        document.getElementById("bottomSafeInsetSpacer").style.height = `${bottomSafeInset}px`;
+        document.body.style.paddingTop = `${topSafeInset}px`;
+        document.body.style.paddingBottom = `${bottomSafeInset}px`;
 
-        // Bottom safe area (red bar)
-        const bottomSpacer = document.getElementById("bottomSafeInsetSpacer");
-        bottomSpacer.style.height = `${bottomSafeInset}px`;
-
-        // Add navigation bar height as internal padding
-        document.body.style.paddingBottom = `${navigationBarHeight}px`;
-
-        // Dark mode
         if (brightness === 'dark') {
           document.body.style.backgroundColor = "#121212";
           document.body.style.color = "#f0f0f0";
         }
 
-        // Show raw data
         document.getElementById("mediaQueryOutput").textContent =
           JSON.stringify(data, null, 2);
       } catch (e) {
