@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Cache Test Counter</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f6f8; }
+        .logo { height: 40px; margin: 16px; }
+        .container { padding: 16px; }
+        .section { background: #ffffff; padding: 16px; border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,.05); }
+        .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        button { background-color: #007acc; color: white; border: none; border-radius: 4px; padding: 10px 14px; font-size: 14px; cursor: pointer; }
+        button:hover { background-color: #005fa3; }
+        .toolbar { background: white; padding: 12px; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 12px; font-weight: bold; }
+        .banner { background-color: #e3f7e3; border-left: 4px solid #28a745; padding: 12px; margin-bottom: 16px; display: none; }
+        .kv { display:flex; gap:8px; align-items:center; margin: 6px 0; }
+        .kv .k { color:#555; min-width: 160px; }
+        .count { font-size: 48px; font-weight: 700; letter-spacing: 1px; }
+        .muted { color:#666; font-size: 12px; }
+    </style>
+</head>
+<body>
+<img src="https://webtrit.com/wp-content/uploads/2021/03/WebTrit-logo-web.png" alt="WebTrit Logo"
+     class="logo"/>
+
+<div class="container">
+    <div class="banner" id="savedBanner">✅ Saved</div>
+
+    <div class="section">
+        <div style="padding:12px 0;">
+            <div class="toolbar">Remote Cache Counter</div>
+        </div>
+        <div style="padding:12px 0;">
+            <div class="kv">
+                <div class="k">Current value:</div>
+                <div id="remote" class="count">1</div>
+            </div>
+
+        </div>
+
+        <div class="toolbar">Local Cache Counter</div>
+
+        <div style="padding:12px 0;">
+            <div class="kv">
+                <div class="k">Current value:</div>
+                <div id="value" class="count">0</div>
+            </div>
+            <div class="kv">
+                <div class="k">Last updated:</div>
+                <div id="updated" class="muted">—</div>
+            </div>
+            <div class="kv">
+                <div class="k">Storage mode:</div>
+                <div id="persist" class="muted">checking…</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="change(1)">+1</button>
+            <button onclick="change(10)">+10</button>
+            <button onclick="change(-1)">−1</button>
+            <button onclick="resetCounter()">Reset</button>
+            <button onclick="forceSave()">Force Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const KEY = 'wt_cache_counter_v1';
+    const META_KEY = 'wt_cache_counter_meta_v1';
+    const valueEl = document.getElementById('value');
+    const updatedEl = document.getElementById('updated');
+    const persistEl = document.getElementById('persist');
+    const bannerEl = document.getElementById('savedBanner');
+
+    function showSaved() {
+      bannerEl.style.display = 'block';
+      clearTimeout(showSaved._t);
+      showSaved._t = setTimeout(() => bannerEl.style.display = 'none', 1200);
+    }
+
+    function nowIso() { return new Date().toISOString(); }
+
+    function read() {
+      const v = parseInt(localStorage.getItem(KEY) || '0', 10);
+      const meta = JSON.parse(localStorage.getItem(META_KEY) || '{}');
+      valueEl.textContent = String(isNaN(v) ? 0 : v);
+      updatedEl.textContent = meta.updatedAt || '—';
+    }
+
+    function write(v) {
+      localStorage.setItem(KEY, String(v));
+      localStorage.setItem(META_KEY, JSON.stringify({ updatedAt: nowIso() }));
+      read();
+      showSaved();
+    }
+
+    function change(delta) {
+      const current = parseInt(localStorage.getItem(KEY) || '0', 10) || 0;
+      write(current + delta);
+    }
+
+    function resetCounter() {
+      write(0);
+    }
+
+    function forceSave() {
+      // no-op write to update timestamp, useful to test cache after app updates
+      const current = parseInt(localStorage.getItem(KEY) || '0', 10) || 0;
+      write(current);
+    }
+
+    async function tryPersist() {
+      if (!navigator.storage || !navigator.storage.persist) {
+        persistEl.textContent = 'not supported';
+        return;
+      }
+      const persisted = await navigator.storage.persisted();
+      if (persisted) {
+        persistEl.textContent = 'already persisted';
+        return;
+      }
+      const granted = await navigator.storage.persist();
+      persistEl.textContent = granted ? 'persist granted' : 'temporary (may evict)';
+    }
+
+    // Initialize
+    read();
+    tryPersist();
+</script>
+</body>
+</html>

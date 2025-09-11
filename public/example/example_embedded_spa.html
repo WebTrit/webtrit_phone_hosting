@@ -4,28 +4,127 @@
     <meta charset="UTF-8"/>
     <title>Main</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f6f8; }
-        .logo { height: 40px; margin: 16px; }
-        .container { padding: 16px; }
-        .tabs { display: flex; gap: 8px; border-bottom: 1px solid #ccc; margin-bottom: 16px; }
-        .tab { padding: 10px 16px; cursor: pointer; border-radius: 4px 4px 0 0; background: #e0e0e0; }
-        .tab.active { background: #ffffff; font-weight: bold; border-bottom: 2px solid #007acc; }
-        .section { background: #ffffff; padding: 16px; border-radius: 0 0 8px 8px; box-shadow: 0 0 6px rgba(0,0,0,.05); }
-        .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        button { background-color: #007acc; color: white; border: none; border-radius: 4px; padding: 10px 14px; font-size: 14px; cursor: pointer; }
-        button:hover { background-color: #005fa3; }
-        pre { background: #f3f3f3; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
-        .banner { background-color: #e3f7e3; border-left: 4px solid #28a745; padding: 12px; margin-bottom: 16px; display: none; }
-        .page { padding: 16px; }
-        .toolbar { background: white; padding: 12px; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 12px; font-weight: bold; }
-        .toolbar button { background: none; color: #007acc; font-size: 16px; padding: 6px 12px; }
-        .toolbar button:hover { text-decoration: underline; }
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f6f8
+        }
+
+        .logo {
+            height: 40px;
+            margin: 16px
+        }
+
+        .container {
+            padding: 16px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 16px
+        }
+
+        .tab {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            background: #e0e0e0
+        }
+
+        .section {
+            background: #fff;
+            padding: 16px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 0 6px rgba(0, 0, 0, .05)
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px
+        }
+
+        button {
+            background-color: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            cursor: pointer
+        }
+
+        button:hover {
+            background-color: #005fa3
+        }
+
+        pre {
+            background: #f3f3f3;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px
+        }
+
+        .banner {
+            background-color: #e3f7e3;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: none
+        }
+
+        .page {
+            padding: 16px
+        }
+
+        .toolbar {
+            background: #fff;
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold
+        }
+
+        .toolbar button {
+            background: none;
+            color: #007acc;
+            font-size: 16px;
+            padding: 6px 12px
+        }
+
+        .toolbar button:hover {
+            text-decoration: underline
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .chip {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #eee;
+            font-size: 12px
+        }
     </style>
 </head>
 <body>
-<img src="https://webtrit.com/wp-content/uploads/2021/03/WebTrit-logo-web.png" alt="WebTrit Logo"
-     class="logo"/>
+<img src="https://webtrit.com/wp-content/uploads/2021/03/WebTrit-logo-web.png" alt="WebTrit Logo" class="logo"/>
 
 <div id="main" class="container">
     <div class="banner" id="reconnectBanner">🔄 Reconnected successfully</div>
@@ -70,42 +169,100 @@
 </div>
 
 <script>
-    window.__injectedData__ = {
-        mediaQuery: null,
-        payload: null,
-        deviceInfo: null,
-        lastReconnectTime: null,
-    };
+	const VERSION_ENDPOINT = "https://europe-west1-webtrit-app.cloudfunctions.net/getPageVersion";
 
-    let currentTab = 'status';
+	window.__injectedData__ = {mediaQuery: null, payload: null, deviceInfo: null, lastReconnectTime: null};
+	let currentTab = 'status';
+	let latestVersion = null;
+	let versionStatus = 'loading';
 
-    function switchTab(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        render();
-    }
+	function getVersionChannel() {
+		return window.WebtritPageVersionChannel;
+	}
 
-    function callFlutter(command) {
-        if (window.WebTritChannel && typeof window.WebTritChannel.postMessage === 'function') {
-            window.WebTritChannel.postMessage(command);
-        } else {
-            alert('WebTritChannel not available.');
-        }
-    }
+	function postPageVersionToApp(version) {
+		const ch = getVersionChannel();
+		const payload = {event: 'pageVersion', data: {pageVersion: version}};
+		if (ch && typeof ch.postMessage === 'function') {
+			ch.postMessage(JSON.stringify(payload));
+			console.info('[VersionHook] Sent:', payload);
+		} else {
+			console.warn('[VersionHook] Channel not available', payload);
+		}
+	}
 
-    function showReconnectBanner() {
-        const banner = document.getElementById('reconnectBanner');
-        banner.style.display = 'block';
-        setTimeout(() => banner.style.display = 'none', 3000);
-    }
+	function whenVersionChannelReady(cb, {tries = 20, interval = 150} = {}) {
+		let n = 0;
+		const tick = () => {
+			const ch = getVersionChannel();
+			if (ch && typeof ch.postMessage === 'function') cb();
+			else if (++n < tries) setTimeout(tick, interval);
+			else console.warn('[VersionHook] Channel not available after retries');
+		};
+		tick();
+	}
 
-    function render() {
-        const el = document.getElementById('tabContent');
-        const data = window.__injectedData__;
+	function callFlutter(command) {
+		const ch = window.WebTritChannel;
+		if (ch && typeof ch.postMessage === 'function') ch.postMessage(command);
+		else alert('WebTritChannel not available.');
+	}
 
-        if (currentTab === 'status') {
-            el.innerHTML = `
+	async function fetchVersion() {
+		versionStatus = 'loading';
+		render();
+		try {
+			const res = await fetch(VERSION_ENDPOINT, {
+				method: 'GET',
+				headers: {'Cache-Control': 'no-store'},
+				cache: 'no-store',
+			});
+			const json = await res.json();
+			latestVersion = (json && json.version) ? String(json.version) : null;
+			versionStatus = latestVersion ? 'ok' : 'error';
+		} catch (e) {
+			console.warn('Failed to fetch page version', e);
+			latestVersion = null;
+			versionStatus = 'error';
+		}
+		render();
+	}
+
+	async function fetchAndSendPageVersion() {
+		await fetchVersion();
+		postPageVersionToApp(latestVersion || '0.0.0');
+	}
+
+	function switchTab(tab) {
+		currentTab = tab;
+		document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+		document.getElementById('tab-' + tab).classList.add('active');
+		render();
+	}
+
+	function showReconnectBanner() {
+		const b = document.getElementById('reconnectBanner');
+		b.style.display = 'block';
+		setTimeout(() => b.style.display = 'none', 3000)
+	}
+
+	function render() {
+		const el = document.getElementById('tabContent');
+		const data = window.__injectedData__;
+		const versionChip =
+			versionStatus === 'loading' ? '<span class="chip">version: loading…</span>' :
+				versionStatus === 'error' ? '<span class="chip" style="background:#fde2e2">version: error</span>' :
+					`<span class="chip">version: ${latestVersion}</span>`;
+
+		if (currentTab === 'status') {
+			el.innerHTML = `
+        <div class="row" style="margin-bottom:12px;">
+          <div><strong>PAGE_VERSION:</strong></div>
+          <div style="margin-left:6px">${versionChip}</div>
+          <button style="margin-left:8px" onclick="whenVersionChannelReady(fetchAndSendPageVersion)">Resend to App</button>
+          <button style="margin-left:8px" onclick="fetchVersion()">Refresh from Server</button>
+        </div>
+
         <p><strong>Last reconnect:</strong> ${data.lastReconnectTime || 'Never'}</p>
         <h4>Injected MediaQuery:</h4>
         <pre>${JSON.stringify(data.mediaQuery, null, 2) || 'No data'}</pre>
@@ -114,86 +271,90 @@
         <h4>Injected Device Info:</h4>
         <pre>${JSON.stringify(data.deviceInfo, null, 2) || 'No data'}</pre>
       `;
-        }
+		}
 
-        if (currentTab === 'navigation') {
-            el.innerHTML = `
+		if (currentTab === 'navigation') {
+			el.innerHTML = `
         <div class="buttons">
           <button onclick="location.hash = '#/media'">Show MediaQuery</button>
           <button onclick="location.hash = '#/payload'">Show Payload</button>
-          <button onclick="location.hash = '#/device'">Show Device Info</button> <!-- NEW -->
+          <button onclick="location.hash = '#/device'">Show Device Info</button>
         </div>
         <ul>
           <li><a href="https://example.com">🌐 Test link (WebView)</a></li>
           <li><a href="app://openinexternalbrowser?url=https://webtrit.com">🌍 Open WebTrit externally</a></li>
         </ul>
-      `;
-        }
 
-        if (currentTab === 'voip') {
-            el.innerHTML = `
+        <h4>Version</h4>
+        <div class="row" style="margin-bottom:8px;">
+          ${versionChip}
+          <button style="margin-left:8px" onclick="whenVersionChannelReady(fetchAndSendPageVersion)">Resend to App</button>
+          <button style="margin-left:8px" onclick="fetchVersion()">Refresh from Server</button>
+        </div>
+      `;
+		}
+
+		if (currentTab === 'voip') {
+			el.innerHTML = `
         <div class="buttons">
           <button onclick="callFlutter('startCall')">Start VOIP Call</button>
           <button onclick="callFlutter('endCall')">End Call</button>
           <button onclick="callFlutter('toggleMute')">Toggle Mute</button>
         </div>
       `;
-        }
-    }
+		}
+	}
 
-    function handleHash() {
-        const hash = location.hash;
-        const isDetails = ['#/media', '#/payload', '#/device'].includes(hash);
+	function handleHash() {
+		const hash = location.hash;
+		const isDetails = ['#/media', '#/payload', '#/device'].includes(hash);
+		document.getElementById('main').style.display = isDetails ? 'none' : 'block';
+		document.getElementById('mediaPage').style.display = hash === '#/media' ? 'block' : 'none';
+		document.getElementById('payloadPage').style.display = hash === '#/payload' ? 'block' : 'none';
+		document.getElementById('deviceInfoPage').style.display = hash === '#/device' ? 'block' : 'none';
+		const data = window.__injectedData__;
+		if (hash === '#/media') document.getElementById('mediaContent').textContent = JSON.stringify(data.mediaQuery, null, 2) || 'No data';
+		if (hash === '#/payload') document.getElementById('payloadContent').textContent = JSON.stringify(data.payload, null, 2) || 'No data';
+		if (hash === '#/device') document.getElementById('deviceInfoContent').textContent = JSON.stringify(data.deviceInfo, null, 2) || 'No data';
+	}
 
-        document.getElementById('main').style.display = isDetails ? 'none' : 'block';
-        document.getElementById('mediaPage').style.display = hash === '#/media' ? 'block' : 'none';
-        document.getElementById('payloadPage').style.display = hash === '#/payload' ? 'block' : 'none';
-        document.getElementById('deviceInfoPage').style.display = hash === '#/device' ? 'block' : 'none'; // NEW
+	window.onMediaQueryReady = function (data) {
+		console.log('[Injected] onMediaQueryReady', data);
+		window.__injectedData__.mediaQuery = data;
+		render();
+		handleHash();
+	};
+	window.onPayloadDataReady = function (data) {
+		console.log('[Injected] onPayloadDataReady', data);
+		window.__injectedData__.payload = data;
+		render();
+		handleHash();
+	};
+	window.onDeviceInfoReady = function (data) {
+		console.log('[Injected] onDeviceInfoReady', data);
+		window.__injectedData__.deviceInfo = data;
+		render();
+		handleHash();
+	};
+	window.onWebTritReconnect = function () {
+		const now = new Date();
+		window.__injectedData__.lastReconnectTime = now.toISOString();
+		showReconnectBanner();
+		render();
+	};
 
-        const data = window.__injectedData__;
-        if (hash === '#/media') {
-            document.getElementById('mediaContent').textContent = JSON.stringify(data.mediaQuery, null, 2) || 'No data';
-        }
-        if (hash === '#/payload') {
-            document.getElementById('payloadContent').textContent = JSON.stringify(data.payload, null, 2) || 'No data';
-        }
-        if (hash === '#/device') {
-            document.getElementById('deviceInfoContent').textContent = JSON.stringify(data.deviceInfo, null, 2) || 'No data'; // NEW
-        }
-    }
+	window.addEventListener('hashchange', handleHash);
 
-    window.onMediaQueryReady = function (data) {
-        console.log('[Injected] onMediaQueryReady', data);
-        window.__injectedData__.mediaQuery = data;
-        render();
-        handleHash();
-    };
+	switchTab(currentTab);
+	handleHash();
 
-    window.onPayloadDataReady = function (data) {
-        console.log('[Injected] onPayloadDataReady', data);
-        window.__injectedData__.payload = data;
-        render();
-        handleHash();
-    };
-
-    // NEW: device info handler
-    window.onDeviceInfoReady = function (data) {
-        console.log('[Injected] onDeviceInfoReady', data);
-        window.__injectedData__.deviceInfo = data;
-        render();
-        handleHash();
-    };
-
-    window.onWebTritReconnect = function () {
-        const now = new Date();
-        window.__injectedData__.lastReconnectTime = now.toISOString();
-        showReconnectBanner();
-        render();
-    };
-
-    window.addEventListener('hashchange', handleHash);
-    switchTab(currentTab);
-    handleHash();
+	document.addEventListener('readystatechange', () => {
+		if (document.readyState === 'complete') {
+			fetchVersion().then(() => whenVersionChannelReady(() => {
+				if (latestVersion) postPageVersionToApp(latestVersion);
+			}));
+		}
+	});
 </script>
 </body>
 </html>
