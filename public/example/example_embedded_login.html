@@ -1,119 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>OTP Login</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100vh;
-            margin: 0;
+        /* Layout: keep content at the top */
+        body{
+          font-family:Arial,sans-serif;
+          display:flex;
+          flex-direction:column;
+          min-height:100vh;
+          margin:0;
         }
-
-        .form-container {
-            padding: 16px;
-            margin-bottom: 80px;
+        header{
+          position:sticky; top:0;
+          display:flex;justify-content:flex-end;align-items:center;
+          padding:8px 16px;background:#fafafa;border-bottom:1px solid #eee;
+          z-index:10;
         }
-
-        .description {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 16px;
+        .lang-badge{
+          font-size:12px;font-weight:bold;color:#555;background:#f0f0f0;
+          padding:4px 8px;border-radius:12px;text-transform:uppercase;
         }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 8px;
+        .form-container{
+          padding:16px;
+          /* keep content above the fixed button */
+          padding-bottom:96px;
+          margin:0;
         }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+        .description{font-size:14px;color:#666;margin:16px 0 0}
+        .form-group label{display:block;font-size:14px;color:#555;margin:0 0 8px}
+        .form-group input{
+          width:100%;padding:12px;font-size:16px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box
         }
-
-        .form-group input:focus {
-            border-color: #007bff;
-            outline: none;
+        .form-group input:focus{border-color:#007bff;outline:none}
+        .fixed-button{
+          position:fixed;bottom:16px;left:16px;right:16px;height:40px;
+          background:#F95A14;color:#fff;font-size:16px;text-align:center;border:none;border-radius:24px;cursor:pointer;
+          box-shadow:0 4px 6px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center
         }
-
-        .fixed-button {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            height: 40px;
-            background-color: #F95A14;
-            color: white;
-            font-size: 16px;
-            text-align: center;
-            border: none;
-            border-radius: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .fixed-button:disabled{background:#ddd;cursor:not-allowed}
+        .fixed-button .button-text{display:inline-block}
+        .fixed-button .spinner{
+          display:none;width:20px;height:20px;border:3px solid #fff;border-top:3px solid #F95A14;border-radius:50%;
+          animation:spin 1s linear infinite
         }
-
-        .fixed-button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-
-        .fixed-button .button-text {
-            display: inline-block;
-        }
-
-        .fixed-button .spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid white;
-            border-top: 3px solid #F95A14;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .fixed-button.loading .button-text {
-            display: none;
-        }
-
-        .fixed-button.loading .spinner {
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        .fixed-button.loading .button-text{display:none}
+        .fixed-button.loading .spinner{display:inline-block}
+        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
     </style>
 </head>
-
 <body>
+<header>
+    <span class="lang-badge" id="langBadge">EN</span>
+</header>
+
 <div class="form-container">
+    <!-- INPUT FIRST -->
+    <div class="form-group">
+        <label for="email" id="emailLabel">Email</label>
+        <input id="email" name="email" required autocomplete="email" autocapitalize="none"
+               inputmode="email"/>
+    </div>
+
+    <!-- DESCRIPTION BELOW -->
     <p class="description" id="descriptionText">
         Enter your email to receive a one-time password (OTP) for login.
     </p>
-    <div class="form-group">
-        <label for="email" id="emailLabel">Email</label>
-        <input id="email" name="email" required>
-    </div>
 </div>
 
 <button class="fixed-button" id="submitButton" onclick="handleLogin()">
@@ -122,73 +76,96 @@
 </button>
 
 <script>
+    // --- i18n ---
     const translations = {
-        en: {
-            description: "Enter your email to receive a one-time password (OTP) for login.",
-            emailLabel: "Email",
-            submitButtonText: "Submit",
-            alert: "Please enter your email."
-        },
-        uk: {
-            description: "Введіть свою електронну адресу, щоб отримати одноразовий пароль (OTP) для входу.",
-            emailLabel: "Електронна пошта",
-            submitButtonText: "Надіслати",
-            alert: "Будь ласка, введіть свою електронну адресу."
-        },
-        it: {
-            description: "Inserisci la tua email per ricevere una password monouso (OTP) per l'accesso.",
-            emailLabel: "Email",
-            submitButtonText: "Invia",
-            alert: "Per favore inserisci la tua email."
-        }
+      en: {
+        description: "Enter your email to receive a one-time password (OTP) for login.",
+        emailLabel: "Email",
+        submitButtonText: "Submit",
+        alert: "Please enter your email.",
+        success: "Check your email for the OTP.",
+        failure: "Unable to start sign-up. Please try again."
+      },
+      uk: {
+        description: "Введіть свою електронну адресу, щоб отримати одноразовий пароль (OTP) для входу.",
+        emailLabel: "Електронна пошта",
+        submitButtonText: "Надіслати",
+        alert: "Будь ласка, введіть свою електронну адресу.",
+        success: "Перевірте пошту — ми надіслали OTP.",
+        failure: "Не вдалося почати реєстрацію. Спробуйте ще раз."
+      },
+      it: {
+        description: "Inserisci la tua email per ricevere una password monouso (OTP) per l'accesso.",
+        emailLabel: "Email",
+        submitButtonText: "Invia",
+        alert: "Per favore inserisci la tua email.",
+        success: "Controlla la tua email per l'OTP.",
+        failure: "Impossibile avviare la registrazione. Riprova."
+      }
     };
 
-    function setLocale(locale) {
-        const translation = translations[locale];
-        if (!translation) return;
+    function t(key){
+      const loc = translations[window.currentLocale || "en"] || translations.en;
+      return loc[key] || key;
+    }
 
-        document.getElementById("descriptionText").textContent = translation.description;
-        document.getElementById("emailLabel").textContent = translation.emailLabel;
-        document.getElementById("submitButtonText").textContent = translation.submitButtonText;
-
-        // Store the locale in a global variable for later use (e.g., for alerts)
+    /**
+     * Initialize page from host app.
+     * @param {Object} initData e.g. { locale: "uk", prefillEmail: "user@example.com" }
+     */
+    function initializePage(initData){
+      const { locale, prefillEmail } = initData || {};
+      if (locale && translations[locale]) {
+        const tr = translations[locale];
+        document.getElementById("descriptionText").textContent = tr.description;
+        document.getElementById("emailLabel").textContent = tr.emailLabel;
+        document.getElementById("submitButtonText").textContent = tr.submitButtonText;
+        document.getElementById("langBadge").textContent = locale.toUpperCase();
         window.currentLocale = locale;
+      }
+      if (prefillEmail) document.getElementById("email").value = prefillEmail;
+      window.initData = initData || {};
     }
 
-        function showProgress() {
-            const button = document.getElementById("submitButton");
-            button.disabled = true;
-            button.classList.add("loading");
-        }
-
-        function hideProgress() {
-            const button = document.getElementById("submitButton");
-            button.disabled = false;
-            button.classList.remove("loading");
-        }
-
-    function handleLogin() {
-        const email = document.getElementById("email").value;
-
-        if (!email) {
-            const alertMessage = translations[window.currentLocale || "en"].alert;
-            alert(alertMessage);
-            return;
-        }
-
-        const json = {
-            event: "signup",
-            data: {
-                email: email
-            }
-        };
-
-        WebtritLoginChannel.postMessage(JSON.stringify(json));
+    function setLoading(isLoading){
+      const btn = document.getElementById("submitButton");
+      btn.disabled = isLoading;
+      btn.classList.toggle("loading", isLoading);
     }
 
-    // Initialize default locale
-    setLocale("en");
+    function handleLogin(){
+      const email = document.getElementById("email").value.trim();
+      if (!email){ alert(t("alert")); return; }
+      setLoading(true);
+      const payload = { event: "signup", data: { email } };
+      try{
+        if (typeof WebtritLoginChannel !== "undefined" && WebtritLoginChannel.postMessage){
+          WebtritLoginChannel.postMessage(JSON.stringify(payload));
+        } else {
+          console.log("[mock] postMessage:", payload);
+          setTimeout(() => window.onSignupResult(JSON.stringify({ ok: true })), 800);
+        }
+      } catch(e){
+        console.error("postMessage failed", e);
+        setLoading(false);
+        alert(t("failure"));
+      }
+    }
+
+    window.onSignupResult = function(result){
+      setLoading(false);
+      try{
+        const r = (typeof result === "string") ? JSON.parse(result) : result;
+        if (r && r.ok) alert(t("success"));
+        else alert((r && r.message) ? r.message : t("failure"));
+      } catch(e){
+        console.warn("Invalid result payload", e);
+        alert(t("failure"));
+      }
+    };
+
+    // Default boot for browser; host app should call initializePage(...)
+    initializePage({ locale: "en" });
 </script>
 </body>
-
 </html>

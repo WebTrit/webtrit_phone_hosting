@@ -4,114 +4,23 @@
     <meta charset="UTF-8"/>
     <title>Main</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f5f6f8;
-        }
-
-        .logo {
-            height: 40px;
-            margin: 16px;
-        }
-
-        .container {
-            padding: 16px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 16px;
-        }
-
-        .tab {
-            padding: 10px 16px;
-            cursor: pointer;
-            border-radius: 4px 4px 0 0;
-            background: #e0e0e0;
-        }
-
-        .tab.active {
-            background: #ffffff;
-            font-weight: bold;
-            border-bottom: 2px solid #007acc;
-        }
-
-        .section {
-            background: #ffffff;
-            padding: 16px;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        button {
-            background-color: #007acc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 14px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #005fa3;
-        }
-
-        pre {
-            background: #f3f3f3;
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 13px;
-        }
-
-        .banner {
-            background-color: #e3f7e3;
-            border-left: 4px solid #28a745;
-            padding: 12px;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .page {
-            padding: 16px;
-        }
-
-        .toolbar {
-            background: white;
-            padding: 12px;
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: bold;
-        }
-
-        .toolbar button {
-            background: none;
-            color: #007acc;
-            font-size: 16px;
-            padding: 6px 12px;
-        }
-
-        .toolbar button:hover {
-            text-decoration: underline;
-        }
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f6f8; }
+        .logo { height: 40px; margin: 16px; }
+        .container { padding: 16px; }
+        .tabs { display: flex; gap: 8px; border-bottom: 1px solid #ccc; margin-bottom: 16px; }
+        .tab { padding: 10px 16px; cursor: pointer; border-radius: 4px 4px 0 0; background: #e0e0e0; }
+        .tab.active { background: #ffffff; font-weight: bold; border-bottom: 2px solid #007acc; }
+        .section { background: #ffffff; padding: 16px; border-radius: 0 0 8px 8px; box-shadow: 0 0 6px rgba(0,0,0,.05); }
+        .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        button { background-color: #007acc; color: white; border: none; border-radius: 4px; padding: 10px 14px; font-size: 14px; cursor: pointer; }
+        button:hover { background-color: #005fa3; }
+        pre { background: #f3f3f3; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+        .banner { background-color: #e3f7e3; border-left: 4px solid #28a745; padding: 12px; margin-bottom: 16px; display: none; }
+        .page { padding: 16px; }
+        .toolbar { background: white; padding: 12px; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 12px; font-weight: bold; }
+        .toolbar button { background: none; color: #007acc; font-size: 16px; padding: 6px 12px; }
+        .toolbar button:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -150,113 +59,141 @@
     </div>
 </div>
 
+<div id="deviceInfoPage" style="display:none">
+    <div class="toolbar">
+        <button onclick="location.hash = '#/'">← Back</button>
+        Device Info
+    </div>
+    <div class="page">
+        <pre id="deviceInfoContent">Loading...</pre>
+    </div>
+</div>
+
 <script>
-	window.__injectedData__ = {
-		mediaQuery: null,
-		payload: null,
-		lastReconnectTime: null,
-	};
+    window.__injectedData__ = {
+        mediaQuery: null,
+        payload: null,
+        deviceInfo: null,
+        lastReconnectTime: null,
+    };
 
-	let currentTab = 'status';
+    let currentTab = 'status';
 
-	function switchTab(tab) {
-		currentTab = tab;
-		document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-		document.getElementById('tab-' + tab).classList.add('active');
-		render();
-	}
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        render();
+    }
 
-	function callFlutter(command) {
-		if (window.WebTritChannel && typeof window.WebTritChannel.postMessage === 'function') {
-			window.WebTritChannel.postMessage(command);
-		} else {
-			alert('WebTritChannel not available.');
-		}
-	}
+    function callFlutter(command) {
+        if (window.WebTritChannel && typeof window.WebTritChannel.postMessage === 'function') {
+            window.WebTritChannel.postMessage(command);
+        } else {
+            alert('WebTritChannel not available.');
+        }
+    }
 
-	function showReconnectBanner() {
-		const banner = document.getElementById('reconnectBanner');
-		banner.style.display = 'block';
-		setTimeout(() => banner.style.display = 'none', 3000);
-	}
+    function showReconnectBanner() {
+        const banner = document.getElementById('reconnectBanner');
+        banner.style.display = 'block';
+        setTimeout(() => banner.style.display = 'none', 3000);
+    }
 
-	function render() {
-		const el = document.getElementById('tabContent');
-		const data = window.__injectedData__;
+    function render() {
+        const el = document.getElementById('tabContent');
+        const data = window.__injectedData__;
 
-		if (currentTab === 'status') {
-			el.innerHTML = `
+        if (currentTab === 'status') {
+            el.innerHTML = `
         <p><strong>Last reconnect:</strong> ${data.lastReconnectTime || 'Never'}</p>
         <h4>Injected MediaQuery:</h4>
         <pre>${JSON.stringify(data.mediaQuery, null, 2) || 'No data'}</pre>
         <h4>Injected Payload:</h4>
         <pre>${JSON.stringify(data.payload, null, 2) || 'No data'}</pre>
+        <h4>Injected Device Info:</h4>
+        <pre>${JSON.stringify(data.deviceInfo, null, 2) || 'No data'}</pre>
       `;
-		}
+        }
 
-		if (currentTab === 'navigation') {
-			el.innerHTML = `
+        if (currentTab === 'navigation') {
+            el.innerHTML = `
         <div class="buttons">
           <button onclick="location.hash = '#/media'">Show MediaQuery</button>
           <button onclick="location.hash = '#/payload'">Show Payload</button>
+          <button onclick="location.hash = '#/device'">Show Device Info</button> <!-- NEW -->
         </div>
         <ul>
           <li><a href="https://example.com">🌐 Test link (WebView)</a></li>
           <li><a href="app://openinexternalbrowser?url=https://webtrit.com">🌍 Open WebTrit externally</a></li>
         </ul>
       `;
-		}
+        }
 
-		if (currentTab === 'voip') {
-			el.innerHTML = `
+        if (currentTab === 'voip') {
+            el.innerHTML = `
         <div class="buttons">
           <button onclick="callFlutter('startCall')">Start VOIP Call</button>
           <button onclick="callFlutter('endCall')">End Call</button>
           <button onclick="callFlutter('toggleMute')">Toggle Mute</button>
         </div>
       `;
-		}
-	}
+        }
+    }
 
-	function handleHash() {
-		const hash = location.hash;
-		document.getElementById('main').style.display = hash === '#/media' || hash === '#/payload' ? 'none' : 'block';
-		document.getElementById('mediaPage').style.display = hash === '#/media' ? 'block' : 'none';
-		document.getElementById('payloadPage').style.display = hash === '#/payload' ? 'block' : 'none';
+    function handleHash() {
+        const hash = location.hash;
+        const isDetails = ['#/media', '#/payload', '#/device'].includes(hash);
 
-		const data = window.__injectedData__;
-		if (hash === '#/media') {
-			document.getElementById('mediaContent').textContent = JSON.stringify(data.mediaQuery, null, 2) || 'No data';
-		}
-		if (hash === '#/payload') {
-			document.getElementById('payloadContent').textContent = JSON.stringify(data.payload, null, 2) || 'No data';
-		}
-	}
+        document.getElementById('main').style.display = isDetails ? 'none' : 'block';
+        document.getElementById('mediaPage').style.display = hash === '#/media' ? 'block' : 'none';
+        document.getElementById('payloadPage').style.display = hash === '#/payload' ? 'block' : 'none';
+        document.getElementById('deviceInfoPage').style.display = hash === '#/device' ? 'block' : 'none'; // NEW
 
-	window.onMediaQueryReady = function (data) {
-		console.log('[Injected] onMediaQueryReady', data);
-		window.__injectedData__.mediaQuery = data;
-		render();
-		handleHash();
-	};
+        const data = window.__injectedData__;
+        if (hash === '#/media') {
+            document.getElementById('mediaContent').textContent = JSON.stringify(data.mediaQuery, null, 2) || 'No data';
+        }
+        if (hash === '#/payload') {
+            document.getElementById('payloadContent').textContent = JSON.stringify(data.payload, null, 2) || 'No data';
+        }
+        if (hash === '#/device') {
+            document.getElementById('deviceInfoContent').textContent = JSON.stringify(data.deviceInfo, null, 2) || 'No data'; // NEW
+        }
+    }
 
-	window.onPayloadDataReady = function (data) {
-		console.log('[Injected] onPayloadDataReady', data);
-		window.__injectedData__.payload = data;
-		render();
-		handleHash();
-	};
+    window.onMediaQueryReady = function (data) {
+        console.log('[Injected] onMediaQueryReady', data);
+        window.__injectedData__.mediaQuery = data;
+        render();
+        handleHash();
+    };
 
-	window.onWebTritReconnect = function () {
-		const now = new Date();
-		window.__injectedData__.lastReconnectTime = now.toISOString();
-		showReconnectBanner();
-		render();
-	};
+    window.onPayloadDataReady = function (data) {
+        console.log('[Injected] onPayloadDataReady', data);
+        window.__injectedData__.payload = data;
+        render();
+        handleHash();
+    };
 
-	window.addEventListener('hashchange', handleHash);
-	switchTab(currentTab);
-	handleHash();
+    // NEW: device info handler
+    window.onDeviceInfoReady = function (data) {
+        console.log('[Injected] onDeviceInfoReady', data);
+        window.__injectedData__.deviceInfo = data;
+        render();
+        handleHash();
+    };
+
+    window.onWebTritReconnect = function () {
+        const now = new Date();
+        window.__injectedData__.lastReconnectTime = now.toISOString();
+        showReconnectBanner();
+        render();
+    };
+
+    window.addEventListener('hashchange', handleHash);
+    switchTab(currentTab);
+    handleHash();
 </script>
 </body>
 </html>
