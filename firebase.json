@@ -9,6 +9,24 @@
             "value": "*"
           }
         ]
+      },
+      {
+        "source": "/example/cache",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300, must-revalidate, stale-while-revalidate=120, stale-if-error=86400"
+          }
+        ]
+      },
+      {
+        "source": "/example/example_embedded_cache.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300, must-revalidate, stale-while-revalidate=120, stale-if-error=86400"
+          }
+        ]
       }
     ],
     "public": "public",
@@ -79,7 +97,7 @@
         "destination": "/example/example_embedded_spa.html"
       },
       {
-        "source": "example/cache.html",
+        "source": "example/cache",
         "destination": "/example/example_embedded_cache.html"
       },
       {
