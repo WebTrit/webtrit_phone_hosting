@@ -75,6 +75,22 @@
         }
         .contact-info p { margin: 4px 0; color: var(--muted); }
         .contact-info p strong { color: var(--navy); }
+        @media (max-width: 600px) {
+            body { padding: 0; background-color: #fff; }
+            .container {
+                padding: 24px 20px;
+                border-radius: 0;
+                box-shadow: none;
+                max-width: none;
+            }
+            .brand-bar { padding-bottom: 16px; margin-bottom: 24px; }
+            .brand-bar img { height: 32px; }
+            h1 { font-size: 26px; }
+            h2 { font-size: 18px; margin-top: 28px; }
+            p, ul { font-size: 15px; }
+            ul { padding-left: 20px; margin-left: 0; }
+            .contact-info { padding: 18px 20px; }
+        }
     </style>
 </head>
 <body>
